@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: webserver-deploy
+  name: webserver-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webserver-deploy
+  template:
+    metadata:
+      labels:
+        app: webserver-deploy
+    spec:
+      containers:
+      - image: olivercw/webserver
+        name: webserver
+        ports: 
+        - containerPort: 3000
+        # envFrom:
+        #   - secretRef:
+        #       name: mysql-secret
+        #   - configMapRef:
+        #       name: server-configmap
+
+        env: 
+        - name: MYSQL_DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: server-configmap
+              key: mysql-database-host
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-password
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-user
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: server-configmap
+              key: mysql-database
+
+        resources: {}
